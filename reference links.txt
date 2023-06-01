@@ -1,0 +1,5 @@
+https://razorpay.com/docs/payments/payment-gateway/web-integration/standard/test-integration/
+
+https://dashboard.razorpay.com/app/website-app-settings/webhooks
+
+https://razorpay.com/docs/payments/payment-gateway/web-integration/standard/build-integration/
