@@ -1,36 +1,185 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html>
 <head>
     <meta charset="UTF-8">
     <title>Payment Page</title>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 </head>
 <body>
     <h1>Payment Page</h1>
 
-    <form action="https://api.razorpay.com/v1/payments" method="POST">
-        <input type="hidden" th:name="_csrf" value="${_csrf.token}"/>
-        <input type="hidden" name="amount" value="${amount}"/>
-        <input type="hidden" name="currency" value="${currency}"/>
-        <input type="hidden" name="order_id" value="${orderId}"/>
 
-        <input type="text" name="bank_account_number" placeholder="Bank Account Number" required />
-
-        <input type="submit" value="Submit">
-
-        <script src="https://checkout.razorpay.com/v1/checkout.js"
-                data-key="${razorpayApiKey}"
-                data-amount="${amount}"
-                data-currency="${currency}"
-                data-order_id="${orderId}"
-                data-buttontext="Pay with Razorpay"
-                data-name="E-Cart"
-                data-description="Payment for Order"
-                data-image="https://your-store-logo.png"
-                data-prefill.name="John Doe"
-                data-prefill.email="john.doe@example.com"
-                data-theme.color="#F37254">
-        </script>
+    <form action="OrderCreation" method="POST" name="razorpayForm">
+        <label for="username">User name:</label>
+        <input type="text" id="username" name="username" required><br><br>
+        
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required><br><br>
+        
+        <label for="phone">Phone Number:</label>
+        <input type="tel" id="phone" name="phone" required><br><br>
+        
+        <label for="address">Address:</label>
+        <textarea id="address" name="address" required></textarea><br><br>
+        
+        <label for="amount">Amount:</label>
+        <input type="number" id="amount" name="amount" required><br><br>
+        
+        <input id="razorpay_payment_id" type="hidden" name="razorpay_payment_id" />
+        <input id="razorpay_order_id" type="hidden" name="razorpay_order_id" />
+        <input id="razorpay_signature" type="hidden" name="razorpay_signature" />
+        
+        <!-- <input type="submit" value="Pay"> -->
     </form>
+
+    	<button id="rzp-button1" onclick="openCheckout('${razorpayOrderId}')">Pay</button>
+    <script>
+        function openCheckout(orderId) {
+            var options = {
+                key: "rzp_test_Xe8wdVU6XUBoBd",
+                name: "E-Cart",
+                description: "SLAM payments",
+                image: "https://s29.postimg.org/r6dj1g85z/daft_punk.jpg",
+                prefill: {
+                    name: "",
+                    email: "",
+                    contact: ""
+                },
+                notes: {
+                    address: "Hello World",
+                    merchant_order_id: "12312321"
+                },
+                theme: {
+                    color: "#F37254"
+                },
+                order_id: orderId,
+                handler: function (response) {
+                    document.getElementById('razorpay_payment_id').value = response.razorpay_payment_id;
+                    document.getElementById('razorpay_order_id').value = orderId;
+                    document.getElementById('razorpay_signature').value = response.razorpay_signature;
+                    document.razorpayForm.submit();
+                },
+                modal: {
+                    ondismiss: function () {
+                        console.log("This code runs when the popup is closed");
+                    },
+                    escape: true,
+                    backdropclose: false
+                }
+            };
+
+            var rzpButton = document.getElementById("rzp-button1");
+            rzpButton.addEventListener("click", function (e) {
+                e.preventDefault();
+
+                // Get form input values
+                var username = document.getElementById("username").value;
+                var email = document.getElementById("email").value;
+                var contact = document.getElementById("phone").value;
+
+                // Update prefill values
+                options.prefill.name = username;
+                options.prefill.email = email;
+                options.prefill.contact = contact;
+
+                // Open Razorpay checkout with updated options
+                var rzp = new Razorpay(options);
+                rzp.open();
+            });
+        }
+    </script>
 </body>
 </html>
+
+
+
+
+
+<%-- 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Payment Page</title>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+</head>
+<body>
+    <h1>Payment Page</h1>
+
+    <button id="rzp-button1" onclick="openCheckout('${razorpayOrderId}')">Pay</button>
+
+    <form action="OrderCreation" method="POST" name="razorpayForm">
+        <input id="razorpay_payment_id" type="hidden" name="razorpay_payment_id" />
+        <input id="razorpay_order_id" type="hidden" name="razorpay_order_id" />
+        <input id="razorpay_signature" type="hidden" name="razorpay_signature" />
+    </form>
+
+    <script>
+        function openCheckout(orderId) {
+            var options = {
+                key: "rzp_test_Xe8wdVU6XUBoBd",
+                name: "E-Cart",
+                description: "SLAM payments",
+                image: "https://s29.postimg.org/r6dj1g85z/daft_punk.jpg",
+                prefill: {
+                    name: "Daft Punk",
+                    email: "customer@merchant.com",
+                    contact: "+919999999999"
+                },
+                notes: {
+                    address: "Hello World",
+                    merchant_order_id: "12312321"
+                },
+                theme: {
+                    color: "#F37254"
+                },
+                order_id: orderId,
+                handler: function (response) {
+                    document.getElementById('razorpay_payment_id').value = response.razorpay_payment_id;
+                    document.getElementById('razorpay_order_id').value = orderId;
+                    document.getElementById('razorpay_signature').value = response.razorpay_signature;
+                    document.razorpayForm.submit();
+                },
+                modal: {
+                    ondismiss: function () {
+                        console.log("This code runs when the popup is closed");
+                    },
+                    escape: true,
+                    backdropclose: false
+                }
+            };
+
+            var rzp = new Razorpay(options);
+            rzp.open();
+        }
+    </script>
+</body>
+</html>
+ --%>
